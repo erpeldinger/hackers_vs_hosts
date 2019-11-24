@@ -1,0 +1,44 @@
+% This is a graph.
+
+n 0.0 1.0
+n 1.0 1.0
+n 2.0 1.0
+n 3.0 1.0
+n 4.0 1.0
+n 5.0 1.0
+n 6.0 1.0
+n 7.0 1.0
+n 8.0 1.0
+
+e 8 7 0/retour
+e 8 6 0/retour
+e 0 1 8/aller
+e 0 2 7/aller
+e 1 0 0/retour
+e 1 3 4/aller
+e 1 4 4/aller
+e 2 0 0/retour
+e 2 4 2/aller
+e 2 5 5/aller
+e 4 3 0/retour
+e 4 5 0/retour
+e 4 2 0/retour
+e 4 1 0/retour
+e 4 6 4/aller
+e 4 7 3/aller
+e 5 2 0/retour
+e 5 4 2/aller
+e 5 7 3/aller
+e 3 1 0/retour
+e 3 4 1/aller
+e 3 6 5/aller
+e 6 3 0/retour
+e 6 4 0/retour
+e 6 7 4/aller
+e 6 8 6/aller
+e 7 6 0/retour
+e 7 5 0/retour
+e 7 4 0/retour
+e 7 8 8/aller
+
+% End of graph

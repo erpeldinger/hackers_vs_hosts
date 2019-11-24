@@ -1,0 +1,35 @@
+digraph finite_state_machine {
+  	rankdir=LR;
+ 	size="8,5";
+  	node [shape = circle];
+  	  	8 -> 7 [ label = "0/retour" ];
+  	  	8 -> 6 [ label = "0/retour" ];
+  	  	0 -> 1 [ label = "8/aller" ];
+  	  	0 -> 2 [ label = "7/aller" ];
+  	  	1 -> 0 [ label = "0/retour" ];
+  	  	1 -> 3 [ label = "4/aller" ];
+  	  	1 -> 4 [ label = "4/aller" ];
+  	  	2 -> 0 [ label = "0/retour" ];
+  	  	2 -> 4 [ label = "2/aller" ];
+  	  	2 -> 5 [ label = "5/aller" ];
+  	  	4 -> 3 [ label = "0/retour" ];
+  	  	4 -> 5 [ label = "0/retour" ];
+  	  	4 -> 2 [ label = "0/retour" ];
+  	  	4 -> 1 [ label = "0/retour" ];
+  	  	4 -> 6 [ label = "4/aller" ];
+  	  	4 -> 7 [ label = "3/aller" ];
+  	  	5 -> 2 [ label = "0/retour" ];
+  	  	5 -> 4 [ label = "2/aller" ];
+  	  	5 -> 7 [ label = "3/aller" ];
+  	  	3 -> 1 [ label = "0/retour" ];
+  	  	3 -> 4 [ label = "1/aller" ];
+  	  	3 -> 6 [ label = "5/aller" ];
+  	  	6 -> 3 [ label = "0/retour" ];
+  	  	6 -> 4 [ label = "0/retour" ];
+  	  	6 -> 7 [ label = "4/aller" ];
+  	  	6 -> 8 [ label = "6/aller" ];
+  	  	7 -> 6 [ label = "0/retour" ];
+  	  	7 -> 5 [ label = "0/retour" ];
+  	  	7 -> 4 [ label = "0/retour" ];
+  	  	7 -> 8 [ label = "8/aller" ];
+}

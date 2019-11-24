@@ -1,0 +1,23 @@
+Fichier type 
+
+type : Host | Hacker
+
+-------------------- HOST -----------------------
+type nombre
+nb_places
+nb_nuits
+nb_dortoir place_dt1 place_dt2 etc.
+nb_chb_indiv 
+animaux : 1 -> a des animaux
+fumeur 
+tolere_cig : 1 -> tolère cigarette
+
+
+-------------------- HACKER ---------------------
+
+type nombre
+nb_nuits
+mixte : 0 -> nb_chb_indiv uniquement ; 1 -> accepte dortoir
+animaux : 1 -> allergique
+fumeur : 1 
+tolere_cig : 1 -> tolère cigarette

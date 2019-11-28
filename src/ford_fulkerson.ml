@@ -202,24 +202,94 @@ let get_max_flow gr s p =
       loop (update_graph gr2 res var_flow) (debit + var_flow) 
   in
   (* l'appel de la fonction recursive*)
-  loop gr_ecart 0;;
-
-(*On doit update le graphe d'ecart pas le graphe initial ! 
-  Solution -> calculer graphe_ecart dans cette fonction et pas dans find_path *)
-
-(* ---------- ETAPES --------------
-   Init : Flot F = O et  Débit D = 0
-   Itérations : répéter justqu'à ce qu'il n'y ait plus de chemin entre les deux nodes ----> res == [(-1,-1,0)]
-    Chercher un chemin d'un node1 vers un node2 (source -> puits) grâce au graphe d'écarts --->find path
-    Calculer la variation v de flot de ce chemin  ----> get_vflow
-    Mettre à jour le graphe de flot --->update_graph
-    Mettre à jour D = D + v
-*)
+  loop gr_ecart 0
 
 
-;;
+(* ----------------------- FLOT MAX / COUT MIN AVEC MOORE-BELLMAND-FORD -----------------------------*)
+
+let get_pred gr id = 
+(* Pour tous les sommets du graphe, on vérifie si l'arc existe entre le sommet et l'id d'entrée *)
+  let rec aux iter acu = match (node_exists gr iter) with
+    | false -> acu
+    | true -> if not((find_arc gr iter id)==None) then (aux (iter + 1) (iter::acu))else (aux (iter +1) acu)
+  in 
+  aux 0 []
+
+let init_bellman gr s = (* on aurait pu utiliser e_iter*)
+  let rec loop iter acu = match (node_exists gr iter) with
+    | None -> acu
+    | Some lbl -> if iter==s then loop (iter+1) ((0,-1)::acu) else loop (iter+1) ((max_int,-1)::acu)
+  in 
+  loop 0 []
+
+let rec get_cout l x = match l with 
+  | [] -> failwith "[get_cout] Sommet inexistant dans la liste"
+  | (id,c) :: rest -> if x==id then c else get_cout rest x
+
+let get_val_arc gr x y = match find_arc gr x y with
+  | None -> failwith "[get_val_arc] Arc inexistant"
+  | Some lbl -> lbl
+
+let maj_cout l x y = 
+  let rec aux iter l acu = match l with 
+  | [] -> acu
+  | (c,id) :: rest -> if iter==id then 
+    let new_c = (get_cout y) + (get_val_arc gr x y) in
+    if (c > new_c) then
+      aux (iter+1) rest ((new_c,id)::acu)
+    else aux (iter+1) rest ((c,id)::acu) 
+  in
+  aux 0 l []
+
+let find_bellman gr s p =
+  let liste_cout = init_bellman gr s in
+
+  let rec parcours_sommets iter l = match (node_exists gr iter) with 
+      | None -> l
+      | Some lbl -> 
+        let lpred = get_pred gr iter in 
+        let current_cost = get_cout lpred iter in
+        if current_cost = (maj_cout lpred s iter) 
+        then parcours_sommets (iter+1) l  (* AJOUTER PERE(X) DEVIENT Y*)
+        else parcours_sommets (iter+1) l  
+
+        (* e_iter gr get_pred*)
 
 
+
+
+
+
+  (*let rec recherche iter l = 
+    let mutable cont = true in 
+    match (node_exists gr iter) with 
+      | None -> l
+      | Some lbl -> if iter==s then recherche (iter+1) l else
+        let rec aux_pred l acu cont =
+          match l with
+            | [] -> acu
+            | x :: rest -> 
+            *)
+
+
+
+
+
+
+
+              (*let current_cout = get_cout l x in 
+              let lc_modif = maj_cout l x iter in
+              if not(current_cout == get_cout lc_modif x) then aux_pred rest ( :: acu)
+              else recherche (iter+1) l*)
+
+        in 
+        aux_pred (get_pred gr iter)
+         
+  in
+  recherche 0 liste_cout
+
+
+let flowmax_coutmin gr = assert false;;
 
 
 

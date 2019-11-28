@@ -1,12 +1,10 @@
 h 3
 
-p 1
-n 1
-d 0 
-c 1 
-a 0
-f 1
-t 1
+p 1 n 1 d 0 c 1 a 0 f 1 t 1
+p ....
+p ....
+.
+
 
 nb_places 1
 nb_nuits 1

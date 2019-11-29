@@ -249,8 +249,8 @@ let find_bellman gr s p =
       | Some lbl -> 
         let lpred = get_pred gr iter in 
         let current_cost = get_cout lpred iter in
-        if current_cost = (maj_cout lpred s iter) 
-        then parcours_sommets (iter+1) l  (* AJOUTER PERE(X) DEVIENT Y*)
+        if current_cost = get_cout (maj_cout lpred s iter) iter
+        then parcours_sommets (iter+1) l 
         else parcours_sommets (iter+1) l  
 
         (* e_iter gr get_pred*)

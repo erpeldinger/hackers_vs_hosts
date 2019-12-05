@@ -110,6 +110,13 @@ let print_state states =
   in
   aux states
 
+let print_idid_l chemin =
+  let rec aux l = match l with
+    | [] -> Printf.printf"\n %!"
+    | (id , id2) :: rest -> let a = Printf.printf" cout %d id %d \n%!" id id2 in aux rest
+  in
+  aux chemin
+
 let print_nodes chemin =
   let rec aux l = match l with
     | [] -> Printf.printf"\n %!"
@@ -228,8 +235,9 @@ let rec get_cout l x = match l with
 
 let get_val_arc gr x y = match find_arc gr x y with
   | None -> failwith "[get_val_arc] Arc inexistant"
-  | Some lbl -> lbl
+  | Some (cout, sens) -> cout
 
+(* mise à jour du cout dans la liste des couts ----------A DEBUGGER ------------ *)
 let maj_cout gr l x y = 
   let rec aux iter l acu = match l with 
   | [] -> acu
@@ -247,7 +255,7 @@ let rec forall_pred gr l iter acu =  match l with
   | id :: rest -> forall_pred gr rest iter (maj_cout gr acu iter id)
 
 
-let recup_chemin l s p = 
+let recup_chemin_id l s p = 
   let rec chemin acu iter l puits = match l with
   | [] -> acu
   | (c, id) :: rest -> if iter=puits then chemin (id::acu) 0 rest id else chemin acu (iter+1) rest puits
@@ -255,17 +263,25 @@ let recup_chemin l s p =
 chemin [] 0 l p
 
 let find_bellman gr s p =
+let () = Printf.printf"debut Bellman \n%!" in
   let liste_cout = init_bellman gr s in
-  let rec parcours_sommets iter l = match (node_exists gr iter) with 
+  let rec parcours_sommets iter l lancien = match (node_exists gr iter) with 
         | false -> l
         | true -> 
-          let lpred = get_pred gr iter in 
-          let current_cost = get_cout liste_cout iter in
-          if (forall_pred gr lpred iter liste_cout) == liste_cout then liste_cout
-          else parcours_sommets (iter+1) (forall_pred gr lpred iter liste_cout)
+          let lpred = get_pred gr iter in
+          let maj_cout =  forall_pred gr lpred iter lancien in
+          let () = print_idid_l maj_cout in
+          let () = print_idid_l lancien in
+          if maj_cout == lancien then lancien
+          else parcours_sommets (iter+1) maj_cout lancien
   in
-    let lcost_final = parcours_sommets 0 liste_cout in
-    recup_chemin lcost_final s p
+    let lcost_final = parcours_sommets 0 liste_cout liste_cout in
+    let () = Printf.printf"liste cout final : \n%!" in
+    let () = print_idid_l lcost_final in
+    let chemin_id = recup_chemin_id lcost_final s p in
+    let () = Printf.printf"chemin de nodes : \n%!" in
+    let () = print_nodes chemin_id in
+    recup_flow_chemin gr chemin_id
 
 (*
   let rec recherche iter l = 
@@ -277,8 +293,8 @@ let find_bellman gr s p =
           match l with
             | [] -> acu
             | x :: rest -> 
-            *)
-              (*let current_cout = get_cout l x in 
+            
+              let current_cout = get_cout l x in 
               let lc_modif = maj_cout l x iter in
               if not(current_cout == get_cout lc_modif x) then aux_pred rest ( :: acu)
               else recherche (iter+1) l
@@ -288,10 +304,11 @@ let find_bellman gr s p =
          
   in
   recherche 0 liste_cout
-
+*)
    
-
+let flow_max_cout_min gr s p = assert false;;
  
+(*
 let flow_max_cout_min gr s p = 
   (* Mettre les flots du graphe de flots à 0 *)
   let init_flow = gmap gr (fun (flow,capacity) -> (0,capacity)) in
@@ -308,6 +325,4 @@ let flow_max_cout_min gr s p =
   in
   (* l'appel de la fonction recursive*)
   loop gr_ecart 0
-
-
 *)

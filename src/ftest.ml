@@ -50,7 +50,7 @@ let () =
    let trans flow sens = match (flow, sens) with
       | (flow, "aller") -> (flow, 1)
       | (flow, "retour") -> (flow, 0)
-      | _ -> failwith "SENS WTF"
+      | (_, y) -> (flow, -111)
    in
 
   let tecart_of_string str = Scanf.sscanf str "%d/%s" trans in
@@ -59,10 +59,10 @@ let () =
   let gr_string = gmap gr_ecart string_of_tecart in
   let () = export outfile gr_string in*)
 
-(* ----------------- TEST FIND BELLMAN ----------------
+(* ----------------- TEST FIND BELLMAN ----------------*)
 
 let int_graph = gmap graph tarc_of_string in
-  let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
+let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
   let gr_ecart = graphe_ecart init_graphe in
   let mon_chemin = find_bellman (gmap graph tecart_of_string) 0 8 in
   let () =
@@ -71,7 +71,6 @@ let int_graph = gmap graph tarc_of_string in
        | (id1, id2, flow) :: rest -> let a = Printf.printf" %d %d %d " id1 id2 flow in aux rest
      in
      aux mon_chemin in
-*)
 
 
   (* ------- TEST INITIALISATION FORD FULK --------- 
@@ -81,10 +80,11 @@ let int_graph = gmap graph tarc_of_string in
      let () = export outfile (gmap gr_ecart string_of_tecart) in
 *)
 
-  (* ---TEST FORD FULKERSON ------- *)
+  (* ---TEST FORD FULKERSON ------- 
      let int_graph = gmap graph tarc_of_string in
      let debit_final = get_max_flow int_graph 0 8 in
      let () =Printf.printf"debit final : %d \n%!" debit_final in 
+*)
 
   (* ------ TEST FIND PATH ------ 
   (*

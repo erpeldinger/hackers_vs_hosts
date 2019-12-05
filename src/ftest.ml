@@ -59,6 +59,21 @@ let () =
   let gr_string = gmap gr_ecart string_of_tecart in
   let () = export outfile gr_string in*)
 
+(* ----------------- TEST FIND BELLMAN ----------------*)
+
+let int_graph = gmap graph tarc_of_string in
+  let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
+  let gr_ecart = graphe_ecart init_graphe in
+  let mon_chemin = find_bellman (gmap graph tecart_of_string) 0 8 in
+  let () =
+     let rec aux l = match l with
+       | [] -> Printf.printf"\n%!"
+       | (id1, id2, flow) :: rest -> let a = Printf.printf" %d %d %d " id1 id2 flow in aux rest
+     in
+     aux mon_chemin in
+
+
+
   (* ------- TEST INITIALISATION FORD FULK --------- 
      let init_flow = gmap (gmap graph tarc_of_string) (fun (flow,capacity) -> (0,capacity)) in
      (* faire le graphe d'ecart*)

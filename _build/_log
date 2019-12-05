@@ -20,7 +20,7 @@
 # Target: src/ftest.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:src/ftest.cmo, file:src/ftest.ml, implem, include, ocaml, quiet, traverse }
 /home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlc.opt -c -I src -I src/tool_fichiers -o src/ftest.cmo src/ftest.ml # cached
 # Target: src/ford_fulkerson.ml.depends, tags: { extension:ml, file:src/ford_fulkerson.ml, include, ocaml, ocamldep, quiet, traverse }
-/home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamldep.opt -modules src/ford_fulkerson.ml > src/ford_fulkerson.ml.depends
+/home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamldep.opt -modules src/ford_fulkerson.ml > src/ford_fulkerson.ml.depends # cached
 # Target: src/graph.ml.depends, tags: { extension:ml, file:src/graph.ml, include, ocaml, ocamldep, quiet, traverse }
 /home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamldep.opt -modules src/graph.ml > src/graph.ml.depends # cached
 # Target: src/graph.cmx, tags: { compile, extension:cmx, extension:ml, file:src/graph.cmx, file:src/graph.ml, implem, include, native, ocaml, quiet, traverse }
@@ -34,55 +34,9 @@
 # Target: src/tools.cmx, tags: { compile, extension:cmx, extension:ml, file:src/tools.cmx, file:src/tools.ml, implem, include, native, ocaml, quiet, traverse }
 /home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -c -I src -I src/tool_fichiers -o src/tools.cmx src/tools.ml # cached
 # Target: src/ford_fulkerson.cmx, tags: { compile, extension:cmx, extension:ml, file:src/ford_fulkerson.cmx, file:src/ford_fulkerson.ml, implem, include, native, ocaml, quiet, traverse }
-/home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ford_fulkerson.cmx src/ford_fulkerson.ml
-+ /home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ford_fulkerson.cmx src/ford_fulkerson.ml
-File "src/ford_fulkerson.ml", line 62, characters 33-34:
-62 |     | (id1,id2,a) :: rest -> let a =Printf.printf" id1 : %d | id2 : %d | flow : %d \n%!" id1 id2 a in aux rest
-                                      ^
-Warning 26: unused variable a.
-File "src/ford_fulkerson.ml", line 75, characters 20-21:
-75 |       | None -> let a = print_res_find_path acu in failwith "arc not found"
-                         ^
-Warning 26: unused variable a.
-File "src/ford_fulkerson.ml", line 109, characters 34-35:
-109 |     | (id1, color) :: rest -> let a = Printf.printf" %d %s" id1 (mon_match color) in aux rest
-                                        ^
-Warning 26: unused variable a.
-File "src/ford_fulkerson.ml", line 116, characters 24-25:
-116 |     | id :: rest -> let a = Printf.printf" %d " id in aux rest
-                              ^
-Warning 26: unused variable a.
-File "src/ford_fulkerson.ml", line 157, characters 8-11:
-157 |     let aaa = Printf.printf" chemin ordonnee : " in
-              ^^^
-Warning 26: unused variable aaa.
-File "src/ford_fulkerson.ml", line 158, characters 8-9:
-158 |     let a = print_nodes chemin_ordonne in
-              ^
-Warning 26: unused variable a.
-File "src/ford_fulkerson.ml", line 201, characters 9-13:
-201 |      let iter = Printf.printf"une iter  de var_flow=%d \n%!" var_flow in 
-               ^^^^
-Warning 26: unused variable iter.
-File "src/ford_fulkerson.ml", line 263, characters 14-26:
-263 |           let current_cost = get_cout liste_cout iter in
-                    ^^^^^^^^^^^^
-Warning 26: unused variable current_cost.
+/home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ford_fulkerson.cmx src/ford_fulkerson.ml # cached
 # Target: src/ftest.cmx, tags: { compile, extension:cmx, extension:ml, file:src/ftest.cmx, file:src/ftest.ml, implem, include, native, ocaml, quiet, traverse }
-/home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ftest.cmx src/ftest.ml
-+ /home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ftest.cmx src/ftest.ml
-File "src/ftest.ml", line 19, characters 6-13:
-19 |   and outfile = Sys.argv.(4)
-           ^^^^^^^
-Warning 26: unused variable outfile.
-File "src/ftest.ml", line 43, characters 6-22:
-43 |   let string_of_tecart (flow, sens) = match (flow, sens) with
-           ^^^^^^^^^^^^^^^^
-Warning 26: unused variable string_of_tecart.
-File "src/ftest.ml", line 56, characters 6-22:
-56 |   let tecart_of_string str = Scanf.sscanf str "%d/%s" trans in
-           ^^^^^^^^^^^^^^^^
-Warning 26: unused variable tecart_of_string.
+/home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ftest.cmx src/ftest.ml # cached
 # Target: src/ftest.native, tags: { dont_link_with, extension:native, file:src/ftest.native, include, link, native, ocaml, program, quiet, traverse }
-/home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -I src src/graph.cmx src/gfile.cmx src/tools.cmx src/ford_fulkerson.cmx src/ftest.cmx -o src/ftest.native
+/home/commetud/GEI/OCaml/.opam/4.08.1/bin/ocamlopt.opt -I src src/graph.cmx src/gfile.cmx src/tools.cmx src/ford_fulkerson.cmx src/ftest.cmx -o src/ftest.native # cached
 # Compilation successful.

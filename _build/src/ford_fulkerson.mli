@@ -21,8 +21,10 @@ type state = White | Grey | Black
 val graphe_ecart: (int * int) Graph.graph -> (int * int) Graph.graph
 val find_path: (int*int) graph -> id -> id -> (id * id * int) list 
 
+(*
 val find_bellman: (int*int) graph -> id -> id -> (id * id * int) list 
 val flow_max_cout_min: (int * int) graph -> id -> id -> int
+*)
 
 (* Return the flow variation of a path *)
 val get_vflow: ('a * 'a * int) list -> int

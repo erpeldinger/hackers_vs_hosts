@@ -242,16 +242,17 @@ let maj_cout gr l x y =
   in
   aux 0 l []
 
-let rec forall_pred l iter acu =  match l with 
+let rec forall_pred gr l iter acu =  match l with 
   | [] -> acu
-  | id :: rest -> forall_pred rest iter (maj_cout gr acu iter id)
+  | id :: rest -> forall_pred gr rest iter (maj_cout gr acu iter id)
+
 
 let recup_chemin l s p = 
-let chemin acu l = match l with
-| [] -> acu
-| id :: rest -> if (* A COMPLETER *) then chemin (is::acu) rest else chemin acu rest
-in
-chemin [] l
+  let rec chemin acu iter l puits = match l with
+  | [] -> acu
+  | (c, id) :: rest -> if iter=puits then chemin (id::acu) 0 rest id else chemin acu (iter+1) rest puits
+  in
+chemin [] 0 l p
 
 let find_bellman gr s p =
   let liste_cout = init_bellman gr s in
@@ -260,14 +261,14 @@ let find_bellman gr s p =
         | true -> 
           let lpred = get_pred gr iter in 
           let current_cost = get_cout liste_cout iter in
-          if (forall_pred lpred iter liste_cout) == liste_cout then liste_cout
-          else parcours_sommets (iter+1) (forall_pred lpred iter liste_cout)
+          if (forall_pred gr lpred iter liste_cout) == liste_cout then liste_cout
+          else parcours_sommets (iter+1) (forall_pred gr lpred iter liste_cout)
   in
     let lcost_final = parcours_sommets 0 liste_cout in
     recup_chemin lcost_final s p
 
-
-  (*let rec recherche iter l = 
+(*
+  let rec recherche iter l = 
     let mutable cont = true in 
     match (node_exists gr iter) with 
       | None -> l
@@ -287,7 +288,8 @@ let find_bellman gr s p =
          
   in
   recherche 0 liste_cout
-  *) 
+
+   
 
  
 let flow_max_cout_min gr s p = 
@@ -308,4 +310,4 @@ let flow_max_cout_min gr s p =
   loop gr_ecart 0
 
 
-
+*)

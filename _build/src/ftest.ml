@@ -59,7 +59,7 @@ let () =
   let gr_string = gmap gr_ecart string_of_tecart in
   let () = export outfile gr_string in*)
 
-(* ----------------- TEST FIND BELLMAN ----------------*)
+(* ----------------- TEST FIND BELLMAN ----------------
 
 let int_graph = gmap graph tarc_of_string in
   let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
@@ -71,7 +71,7 @@ let int_graph = gmap graph tarc_of_string in
        | (id1, id2, flow) :: rest -> let a = Printf.printf" %d %d %d " id1 id2 flow in aux rest
      in
      aux mon_chemin in
-
+*)
 
 
   (* ------- TEST INITIALISATION FORD FULK --------- 

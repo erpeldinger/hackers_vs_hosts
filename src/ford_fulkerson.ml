@@ -225,42 +225,97 @@ let get_pred gr id =
 let init_bellman gr s = (* on aurait pu utiliser e_iter*)
   let rec loop iter acu = match (node_exists gr iter) with
     | false -> acu
-    | true -> if iter==s then loop (iter+1) ((0,-1)::acu) else loop (iter+1) ((max_int,-1)::acu)
+    | true -> if iter==s then loop (iter+1) ((0,-1)::acu) else loop (iter+1) ((max_int,0)::acu)
   in 
   loop 0 []
 
-let rec get_cout l x = match l with 
-  | [] -> failwith "[get_cout] Sommet inexistant dans la liste"
-  | (id,c) :: rest -> if x==id then c else get_cout rest x
+let get_cout l x = 
+  let rec aux l iter = match l with 
+    | [] -> failwith "[get_cout] Sommet inexistant dans la liste"
+    | (c, id) :: rest -> if x==iter then c else aux rest (iter+1)
+    in 
+  aux l 0
 
 let get_val_arc gr x y = match find_arc gr x y with
   | None -> failwith "[get_val_arc] Arc inexistant"
   | Some (cout, sens) -> cout
 
 (* mise à jour du cout dans la liste des couts ----------A DEBUGGER ------------ *)
-let maj_cout gr l x y = 
-  let rec aux iter l acu = match l with 
-  | [] -> acu
-  | (c,id) :: rest -> if iter==id then 
-      let new_c = (get_cout l y) + (get_val_arc gr x y) in
-      if (c > new_c) then
-        aux (iter+1) rest ((new_c,id)::acu)
-      else aux (iter+1) rest ((c,id)::acu) 
-    else aux (iter+1) rest acu
+
+(* prend une liste de cout et renvoie une nouvelle liste en modifiant la colonne x par (pred, new_cout) *)
+let change_cost lcout x pred new_cout =
+  let rec aux l iter acu = match l with
+    | [] -> acu
+    | (cost, id) :: rest -> if iter==x then aux rest (iter+1) ((new_cout, pred)::acu)
+                            else aux rest (iter + 1) ((cost,id)::acu)
+  in 
+  aux lcout 0 []
+
+(* le "for tous les predecesseurs" avec lpred la liste des y  + RENVOIE LE CONTINUER *)
+let maj_all_pred gr lcout x lpred =
+  let rec aux l lcost cont= match l with
+    | [] -> (lcost, cont)
+    | y :: rest -> let cout_x = get_cout lcost x in 
+                  let new_cout = (get_cout lcost y) + (get_val_arc gr y x) in 
+                  (* let () = Printf.printf"cout %d %d et new_cout %d" x cout_x new_cout in  *)
+                  if cout_x > new_cout then 
+                    let new_lcout = change_cost lcost x y new_cout in 
+                    aux rest new_lcout true
+                  else aux rest lcost cont
+  in 
+  aux lpred lcout false
+
+(* le for "tous les sommets x!=s" *)
+let for_all_sommets gr lcout s = 
+  let rec aux iter l = 
+    if node_exists gr iter then (* pour tous les nodes du graphe*)
+        if iter==s then aux (iter+1) l (* x=s donc on ne parcours pas les precesseurs*)
+        else let (new_lcout,cont)=maj_all_pred gr lcout iter (get_pred gr iter) in 
+              (* let () = Printf.printf"liste cout %d : \n%!" iter in 
+              let () = print_idid_l new_lcout in 
+              *)
+              if cont then aux iter new_lcout
+              else new_lcout
+    else l
   in
-  aux 0 l []
-
-let rec forall_pred gr l iter acu =  match l with 
-  | [] -> acu
-  | id :: rest -> forall_pred gr rest iter (maj_cout gr acu iter id)
-
+  aux 0 lcout
 
 let recup_chemin_id l s p = 
   let rec chemin acu iter l puits = match l with
   | [] -> acu
   | (c, id) :: rest -> if iter=puits then chemin (id::acu) 0 rest id else chemin acu (iter+1) rest puits
   in
-chemin [] 0 l p
+chemin [] 0 l p 
+
+let test_bellman gr s p = 
+  let liste_cout = init_bellman gr s in
+  let () = Printf.printf" cout initial : \n%!" in 
+  let () = print_idid_l liste_cout in 
+  let lcost_final = for_all_sommets gr liste_cout s in
+  let () = Printf.printf" cout final : \n%!" in 
+  let () = print_idid_l lcost_final in 
+  let chemin_id = recup_chemin_id lcost_final s p in 
+  recup_flow_chemin gr chemin_id
+
+(* ------------- ANCIEN maj cout ---------
+let maj_cout gr l x y = 
+let () = Printf.printf"maj cout debut \n%!" in
+  let rec aux iter l acu = match l with 
+  | [] -> acu
+  | (c,id) :: rest -> if iter==x then (* on va à la bonne colonne de la liste des couts *)
+      let new_c = (get_cout l y) + (get_val_arc gr x y) in
+      let () = Printf.printf"cout : %d et new cout : %d \n%!" c new_c in
+      if (c > new_c) then
+        aux (iter+1) rest ((new_c,id)::acu)
+      else aux (iter+1) rest ((c,id)::acu) 
+    else let () = Printf.printf"iter diff de x : iter %d et x %d \n%!" iter x in aux (iter+1) rest acu
+  in
+  aux 0 l []
+
+let rec forall_pred gr l iter acu =  match l with 
+  | [] -> acu
+  | id :: rest -> let () = Printf.printf"forall pred de iter : %d \n%!" iter in forall_pred gr rest (iter+1) (maj_cout gr acu iter id)
+*)
 
 let find_bellman gr s p =
 let () = Printf.printf"debut Bellman \n%!" in
@@ -268,9 +323,12 @@ let () = Printf.printf"debut Bellman \n%!" in
   let rec parcours_sommets iter l lancien = match (node_exists gr iter) with 
         | false -> l
         | true -> 
-          let lpred = get_pred gr iter in
-          let maj_cout =  forall_pred gr lpred iter lancien in
+          (* let lpred = get_pred gr iter in
+          let maj_cout =  forall_pred gr lpred iter lancien in *)
+          let maj_cout = for_all_sommets gr l s in 
+          let () = Printf.printf"maj couts : \n%!" in
           let () = print_idid_l maj_cout in
+          let () = Printf.printf"ancien couts : \n%!" in
           let () = print_idid_l lancien in
           if maj_cout == lancien then lancien
           else parcours_sommets (iter+1) maj_cout lancien

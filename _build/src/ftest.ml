@@ -38,15 +38,15 @@ let () =
   
   
   (* -------TEST GRAPHE ECART ET FIND PATH--------- *)
-  (*let string_to_tarc str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in*)
+  (*let string_to_tarc str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in
 
   let string_of_tecart (flow, sens) = match (flow, sens) with
     | (flow, 0) -> (string_of_int flow) ^ "/retour"
     | (flow, 1) -> (string_of_int flow) ^ "/aller"
     | (flow,_) -> (string_of_int flow) ^ "/ERROR" in
-
+*)
   let tarc_of_string str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in
-
+(*
    let trans flow sens = match (flow, sens) with
       | (flow, "aller") -> (flow, 1)
       | (flow, "retour") -> (flow, 0)
@@ -54,21 +54,34 @@ let () =
    in
 
   let tecart_of_string str = Scanf.sscanf str "%d/%s" trans in
-
+*)
   (*let gr_ecart = gmap graph tecart_of_string in
   let gr_string = gmap gr_ecart string_of_tecart in
   let () = export outfile gr_string in*)
 
-(* ----------------- TEST FIND BELLMAN ----------------*)
+(* ----------------- TEST FIND BELLMAN ----------------
 
 let int_graph = gmap graph tarc_of_string in
 let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
   let gr_ecart = graphe_ecart init_graphe in
-  let mon_chemin = find_bellman (gmap graph tecart_of_string) 0 8 in
+  let mon_chemin = find_bellman gr_ecart 0 8 in
   let () =
      let rec aux l = match l with
        | [] -> Printf.printf"\n%!"
-       | (id1, id2, flow) :: rest -> let a = Printf.printf" %d %d %d " id1 id2 flow in aux rest
+       | (id1, id2, flow) :: rest -> let () = Printf.printf" %d %d %d " id1 id2 flow in aux rest
+     in
+     aux mon_chemin in
+*)
+
+(* ---------------------TEST TEST BELLMAN--------------------*)
+let int_graph = gmap graph tarc_of_string in
+let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
+  let gr_ecart = graphe_ecart init_graphe in
+  let mon_chemin = test_bellman gr_ecart 0 8 in
+  let () =
+     let rec aux l = match l with
+       | [] -> Printf.printf"\n%!"
+       | (id1, id2, flow) :: rest -> let () = Printf.printf" %d %d %d " id1 id2 flow in aux rest
      in
      aux mon_chemin in
 

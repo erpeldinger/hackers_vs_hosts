@@ -313,12 +313,14 @@ let for_all_sommets gr lcout s =
   aux 0 lcout false
 
 let test_recup l s p =
-  let rec aux acu iter liste puits = if puits <= 0 then (0::acu) else 
+  let rec aux acu (* iter *) liste puits =
     match l with
     | [] -> acu
-    | (c, id) :: rest -> if iter==puits then aux (id::acu) 0 rest id else aux acu (iter+1) rest puits
+    | (c, id) :: rest -> if puits <=0 then 
+                            if not(id==(-1)) then aux (id::acu) rest id else acu
+                        else aux acu rest (puits-1)
   in 
-  List.rev (aux [] 0 l p)
+  List.rev (aux [] l p)
 
 let find_bellman gr s p = 
   let liste_cout = init_bellman gr s in

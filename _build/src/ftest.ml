@@ -38,13 +38,13 @@ let () =
   
   
   (* -------TEST GRAPHE ECART ET FIND PATH--------- *)
-  (*let string_to_tarc str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in
+  (*let string_to_tarc str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in *)
 
   let string_of_tecart (flow, sens) = match (flow, sens) with
     | (flow, 0) -> (string_of_int flow) ^ "/retour"
     | (flow, 1) -> (string_of_int flow) ^ "/aller"
     | (flow,_) -> (string_of_int flow) ^ "/ERROR" in
-*)
+
   let tarc_of_string str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in
 (*
    let trans flow sens = match (flow, sens) with
@@ -73,11 +73,20 @@ let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
      aux mon_chemin in
 *)
 
+
 (* ---------------------TEST TEST BELLMAN--------------------*)
+
+let mfcm_of_string str = Scanf.sscanf str "%d/%d/%d" (fun flow capa cout -> (flow,capa, cout)) in
+let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/r" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout) in
+
+let mfcm_graph = gmap graph mfcm_of_string in 
+let gr_ecart = gr_ecart_MFCM mfcm_graph in
+(*
 let int_graph = gmap graph tarc_of_string in
 let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
-  let gr_ecart = graphe_ecart init_graphe in
-  let mon_chemin = test_bellman gr_ecart 0 8 in
+let gr_ecart = graphe_ecart init_graphe in
+*)
+  let mon_chemin = find_bellman gr_ecart 0 4 in
   let () =
      let rec aux l = match l with
        | [] -> Printf.printf"\n%!"

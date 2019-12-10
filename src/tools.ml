@@ -67,6 +67,7 @@ let add_mfmc_arc gr id1 id2 n =
   with
     e -> raise e;;
     
+(* max flow min cost *)
 let sub_mfmc_arc gr id1 id2 n =
   try 
     let res = find_arc gr id1 id2 in

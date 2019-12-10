@@ -56,13 +56,6 @@ let recup_chemin l s p =
   in 
   List.rev (aux [] l)
 
-let print_res_find_path chemin =
-  let rec aux l = match l with
-    | [] -> Printf.printf" \n%!"
-    | (id1,id2,a) :: rest -> let () =Printf.printf" id1 : %d | id2 : %d | flow : %d \n%!" id1 id2 a in aux rest
-  in
-  aux chemin
-
 (* prend un chemin composé d'id et renvoie le chemin compose de (id id flow) *)
 let recup_flow_chemin gr l =
   let rec recup acu l = match l with
@@ -72,7 +65,7 @@ let recup_flow_chemin gr l =
         | None -> failwith "arc not found"
         | Some (flow,_) -> (id1, id2, flow) :: acu)
     | id1 :: id2 :: rest -> match (find_arc gr id1 id2) with
-      | None -> let () = print_res_find_path acu in failwith "arc not found"
+      | None -> failwith "arc not found"
       | Some (flow,_) -> recup ( (id1, id2, flow) :: acu) (id2 ::rest)
   in
   List.rev (recup [] l)
@@ -123,6 +116,13 @@ let print_nodes chemin =
   in
   aux chemin
 
+let print_res_find_path chemin =
+  let rec aux l = match l with
+    | [] -> Printf.printf" \n%!"
+    | (id1,id2,a) :: rest -> let () =Printf.printf" id1 : %d | id2 : %d | cout : %d \n%!" id1 id2 a in aux rest
+  in
+  aux chemin
+
 (* recherche d'un chemin dans un graphe -- parcours en profondeur 
 à refaire : verifier que les arcs n'ait pas flow==capa (arc retour ==0)
 *)
@@ -148,7 +148,7 @@ let find_path gr n1 n2 =
                               | Some (flow, sens) -> if (flow>0) && (id==n2) then (change_color states n2 Grey, List.rev (s::(List.rev l_antecedant))) else  (* verification de la terminaison *)
                                     (if (flow>0) && (List.assoc id states)==White then voisins id (out_arcs init_gr_ecart id) states (List.rev (s :: (List.rev l_antecedant)))
                                     else voisins s rest states l_antecedant)
-                              )
+                              ) 
                               else voisins s rest states l_antecedant
     | (id,(flow,a)) :: rest -> failwith ("erreur lbl find path"^(string_of_int a))
   in
@@ -213,12 +213,23 @@ let get_max_flow gr s p =
 
 (* ----------------------- FLOT MAX / COUT MIN AVEC MOORE-BELLMAND-FORD -----------------------------*)
 
-(* les arcs "aller" *)
-let arcs1_MFCM gr = gmap gr (fun (flow, capa, cout) -> (cout,1))
+(* Met à jour le graphe de flots *)
+let update_graph_BF gr path v = 
+  let rec update_path gr1 path = match path with
+    | [] -> gr1
+    | (id1, id2, flow) :: rest -> 
+      match (find_arc gr id1 id2) with
+      | None -> (* arc inverse donc soustraction *) update_path (sub_mfmc_arc gr1 id2 id1 v) rest
+      | Some (flow, capa, _) -> update_path (add_mfmc_arc gr1 id1 id2 v) rest
+  in 
+  update_path gr path
 
-(* les arcs retour, initialement tous nuls *)
+(* les arcs "aller" : si le flot est pas égal à la capa, il vaut le cout *)
+let arcs1_MFCM gr = gmap gr (fun (flow, capa, cout) -> if not(flow==capa) then (cout,1) else (0,1) )
+
+(* les arcs retour, si le flto est pas nul, il vaut -cout *)
 let arcs2_MFCM gr = 
-  let modif_arc gr id1 id2 (flow,capa,cout) = new_arc gr id2 id1 ((0,0)) in
+  let modif_arc gr id1 id2 (flow,capa,cout) = new_arc gr id2 id1 ( if not(flow==0) then ((-cout), 0) else (0,0)) in
   let new_gr = clone_nodes gr in
   e_fold gr modif_arc new_gr ;;
 
@@ -264,6 +275,7 @@ let change_cost lcout x pred new_cout =
   in 
   List.rev (aux lcout 0 [])
 
+
 (* le "for tous les predecesseurs" avec lpred la liste des y  + RENVOIE LE CONTINUER *)
 let maj_all_pred gr lcout x lpred =
   let rec aux l lcost cont= match l with
@@ -271,22 +283,24 @@ let maj_all_pred gr lcout x lpred =
     | y :: rest -> let cout_x = get_cout lcost x in 
                   let cout_y = get_cout lcost y in
                   let cout_arc_xy = get_val_arc gr y x in
-                  if not(cout_y ==max_int) then
-                    let new_cout = cout_y + cout_arc_xy in 
-                    (*
-                    let () = Printf.printf"x est %d et y est %d \n%!" x y in
-                    let () = Printf.printf" cout y : %d et cout_arc_xy : %d \n%!" cout_y cout_arc_xy in
-                    let () = Printf.printf"cout %d %d et new_cout %d \n%!" x cout_x new_cout in
-                    let () = Printf.printf"liste de cout \n%!" in 
-                    let () = print_idid_l lcost in
-                    *)
-                    if cout_x > new_cout then 
-                      let new_lcout = change_cost lcost x y new_cout in 
-                      (* let () = Printf.printf"Liste new cout : \n%!" in
-                      let () = print_idid_l new_lcout in
+                  if not(cout_arc_xy=0) then
+                    if not(cout_y ==max_int) then
+                      let new_cout = cout_y + cout_arc_xy in 
+                      (*
+                      let () = Printf.printf"x est %d et y est %d \n%!" x y in
+                      let () = Printf.printf" cout y : %d et cout_arc_xy : %d \n%!" cout_y cout_arc_xy in
+                      let () = Printf.printf"cout %d %d et new_cout %d \n%!" x cout_x new_cout in
+                      let () = Printf.printf"liste de cout \n%!" in 
+                      let () = print_idid_l lcost in
                       *)
-                      aux rest new_lcout true
+                      if cout_x > new_cout then 
+                        let new_lcout = change_cost lcost x y new_cout in 
+                        (* let () = Printf.printf"Liste new cout : \n%!" in
+                        let () = print_idid_l new_lcout in
+                        *)
+                        aux rest new_lcout true
                     else aux rest lcost cont
+                  else aux rest lcost cont
                   else aux rest lcost cont
   in 
   let (res,cont) = aux lpred lcout false in
@@ -299,7 +313,7 @@ let maj_all_pred gr lcout x lpred =
 (* le for "tous les sommets x!=s" + LE CONTINUER*)
 let for_all_sommets gr lcout s = 
   let rec aux iter l continuer = 
-  let () = Printf.printf"iter : %d \n%!" iter in
+  (* let () = Printf.printf"iter : %d \n%!" iter in *)
     if node_exists gr iter then (* pour tous les nodes du graphe*)
         if iter==s then aux (iter+1) l continuer (* x=s donc on ne parcours pas les precesseurs*)
         else let (new_lcout,cont)=maj_all_pred gr l iter (get_pred gr iter) in 
@@ -312,52 +326,103 @@ let for_all_sommets gr lcout s =
   in
   aux 0 lcout false
 
-let test_recup l s p =
-  let rec aux acu (* iter *) liste puits =
-    match l with
-    | [] -> acu
-    | (c, id) :: rest -> if puits <=0 then 
-                            if not(id==(-1)) then aux (id::acu) rest id else acu
-                        else aux acu rest (puits-1)
-  in 
-  List.rev (aux [] l p)
+let get_id lcout id = 
+  let rec aux l iter = match l with
+    | [] -> failwith ("[get_id] error"^(string_of_int iter))
+    | (cout, id1) :: rest -> if (iter==id) then id1 else aux rest (iter+1)
 
+  in 
+  aux lcout 0
+
+let recup_chemin_bf l s p = 
+  let rec aux id_courant acu = 
+    if id_courant==s then acu else let next_id = get_id l id_courant in aux next_id (next_id :: acu)
+  in 
+  aux p [p]
+
+let chemin_valide lcout path = 
+  let rec aux validite l = match l with
+    | [] -> validite
+    | id :: rest -> match List.nth lcout id with 
+        | (cout, _) -> if cout == max_int then false else aux validite rest
+  in 
+  aux true path 
+
+(* a partie d'un graph de flow (calcul lui-même le graphe d'écart) *)
 let find_bellman gr s p = 
-  let liste_cout = init_bellman gr s in
-  let rec aux l = match for_all_sommets gr l s with
+  let gr_ecart = gr_ecart_MFCM gr in
+  let liste_cout = init_bellman gr_ecart s in
+  let () = Printf.printf" Liste de cout - Debut : \n%!" in 
+  let () = print_idid_l liste_cout in 
+  let rec aux l = match for_all_sommets gr_ecart l s with
     | (res, false) -> let () = Printf.printf"false\n%!" in res
     | (res, true) -> let () = Printf.printf"continuer\n%!" in aux res
   in 
   let lcost_final = aux liste_cout in 
-  let chemin_id = test_recup lcost_final s p in
   let () = Printf.printf"s : %d et p %d \n%!" s p in 
   let () = Printf.printf" Liste de cout - Fin : \n%!" in 
   let () = print_idid_l lcost_final in 
+
+  let chemin_id = recup_chemin_bf lcost_final s p in
   let () = Printf.printf"chemin id trouve : \n%!" in 
   let () = print_nodes chemin_id in
-  recup_flow_chemin gr chemin_id
 
+  if not(chemin_valide lcost_final chemin_id) then [(-1,-1,0)] 
+  else 
+  let flow_chemin = recup_flow_chemin gr_ecart chemin_id in
+  let () = Printf.printf" flow chemin : \n%!" in 
+  let () = print_res_find_path flow_chemin in
+  flow_chemin
 
 let get_cout_chemin gr res =
   let rec aux acu l = match l with 
   | [] -> acu
   | (id1, id2, cout) :: rest -> match (find_arc gr id1 id2) with
-    | None -> failwith "[get_cout_chemin] arc inexistant"
-    | Some (flow, capa, cout) -> aux (acu+(cout*capa)) res
+        | None -> begin (* on a pris un arc retour *)
+           match (find_arc gr id2 id1) with 
+            | None -> failwith "[get_vflow_bf] error arc inexistant"
+            | Some (flow, capa, cout) -> aux (acu+(cout*capa)) rest
+          end
+    | Some (flow, capa, cout) -> aux (acu+(cout*capa)) rest
   in 
   aux 0 res
 
+let find_min liste = let () = print_nodes liste in
+  let rec aux min l = match l with
+    | [] -> min
+    | flow :: rest -> if min>flow then aux flow rest else aux min rest
+  in 
+  aux max_int liste
+
+let get_vflow_bf gr chemin = 
+  let rec aux acu l = match l with
+    | [] -> acu
+    | (id1, id2, cout) :: rest -> match (find_arc gr id1 id2) with
+        | None -> begin (* on a pris un arc retour *)
+           match (find_arc gr id2 id1) with 
+            | None -> failwith "[get_vflow_bf] error arc inexistant"
+            | Some (flow, capa, cout) -> aux (flow::acu) rest
+          end
+        | Some (flow, capa, cout) -> aux ((capa-flow)::acu) rest
+  in 
+  let liste_flow = aux [] chemin in 
+  find_min liste_flow
+
+
+let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout)
+
 let flow_max_cout_min gr s p = 
-let gr_ecart = gr_ecart_MFCM gr in
-  let rec loop gr2 debit cout = match (find_bellman gr2 s p) with
+(* let gr_ecart = gr_ecart_MFCM gr in *)
+  let rec loop index gr2 debit cout = 
+  Gfile.export ("test"^(string_of_int index)) (gmap gr2 string_of_mfcm);
+  match (find_bellman gr2 s p) with
       | [(-1,-1,0)] -> (debit, cout)
-      | res -> let var_flow = get_vflow res in 
-      (* let print_res = print_res_find_path res in *)
-      let () = Printf.printf"une iter  de var_flow=%d \n%!" var_flow in 
-      let new_cost = get_cout_chemin gr res in
-        loop (update_graph gr2 res var_flow) (debit + var_flow) (cout+new_cost)
+      | res -> let var_flow = get_vflow_bf gr2 res in 
+      let new_cost = get_cout_chemin gr2 res in
+      let () = Printf.printf"une iter : var_flow=%d et cout=%d \n%!" var_flow new_cost in 
+      loop (index+1) (update_graph_BF gr2 res var_flow) (debit + var_flow) (cout+new_cost)
   in
-  loop gr_ecart 0 0
+  loop 0 gr 0 0
 
 (* ------------- ANCIEN maj cout et find bellman---------
 let maj_cout gr l x y = 

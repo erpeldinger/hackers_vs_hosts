@@ -43,7 +43,7 @@ let add_tecart_arc gr id1 id2 n =
   try 
     let res = find_arc gr id1 id2 in
     match res with
-    | None -> failwith "t_arc inexistant"
+    | None -> failwith "t_earc inexistant"
     | Some (flow, sens) -> new_arc gr id1 id2 (flow+n,sens)
   with
     e -> raise e;;
@@ -52,7 +52,26 @@ let sub_tecart_arc gr id1 id2 n =
   try 
     let res = find_arc gr id1 id2 in
     match res with
-    | None -> failwith "t_arc inexistant"
+    | None -> failwith "t_earc inexistant"
     | Some (flow, sens) -> new_arc gr id1 id2 (flow-n,sens)
+  with
+    e -> raise e;;
+
+(* max flow min cost *)
+let add_mfmc_arc gr id1 id2 n =
+  try 
+    let res = find_arc gr id1 id2 in
+    match res with
+    | None -> failwith "[add_arc] mfcm_arc inexistant"
+    | Some (flow, capa, cout) -> new_arc gr id1 id2 (flow+n,capa,cout)
+  with
+    e -> raise e;;
+    
+let sub_mfmc_arc gr id1 id2 n =
+  try 
+    let res = find_arc gr id1 id2 in
+    match res with
+    | None -> failwith "[sub arc] mfcm_arc inexistant"
+    | Some (flow, capa, cout) -> new_arc gr id1 id2 (flow-n,capa,cout)
   with
     e -> raise e;;

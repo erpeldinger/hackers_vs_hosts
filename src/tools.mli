@@ -20,3 +20,7 @@ val add_tarc: (int * 'a) graph -> id -> id -> int -> (int * 'a) graph
 val add_tecart_arc: (int * 'a) graph -> id -> id -> int -> (int * 'a) graph
 
 val sub_tecart_arc: (int * 'a) graph -> id -> id -> int -> (int * 'a) graph
+
+val add_mfmc_arc: (int * int * 'a) graph -> id -> id -> int -> (int * int * 'a) graph
+
+val sub_mfmc_arc: (int * int * 'a) graph -> id -> id -> int -> (int * int * 'a) graph

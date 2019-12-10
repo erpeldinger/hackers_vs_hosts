@@ -36,7 +36,6 @@ let () =
   (* let () = write_file outfile (gmap graph (fun x -> "test" ^ x)) in *)
   (*let () = write_file outfile (gmap ((add_arc (gmap graph int_of_string) 0 2 10)) string_of_int) in*)
   
-  
   (* -------TEST GRAPHE ECART ET FIND PATH--------- *)
   (*let string_to_tarc str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in *)
 
@@ -74,10 +73,10 @@ let init_graphe = gmap int_graph (fun (flow,capacity) -> (0,capacity)) in
 *)
 
 
-(* ---------------------TEST TEST BELLMAN--------------------*)
+(* ---------------------TEST FIND BELLMAN--------------------
 
 let mfcm_of_string str = Scanf.sscanf str "%d/%d/%d" (fun flow capa cout -> (flow,capa, cout)) in
-let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/r" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout) in
+let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout) in
 
 let mfcm_graph = gmap graph mfcm_of_string in 
 let gr_ecart = gr_ecart_MFCM mfcm_graph in
@@ -93,6 +92,27 @@ let gr_ecart = graphe_ecart init_graphe in
        | (id1, id2, flow) :: rest -> let () = Printf.printf" %d %d %d " id1 id2 flow in aux rest
      in
      aux mon_chemin in
+*)
+
+(* ---------------------TEST FIND BELLMAN + UPDATE -------------------- 
+
+let mfcm_of_string str = Scanf.sscanf str "%d/%d/%d" (fun flow capa cout -> (flow,capa, cout)) in
+let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout) in
+
+let mfcm_graph = gmap graph mfcm_of_string in 
+let res = find_bellman mfcm_graph 0 4 in 
+let var_flow = get_vflow_bf mfcm_graph res in
+let up_gr = update_graph_BF mfcm_graph res var_flow in 
+let () = export outfile (gmap up_gr string_of_mfcm) in 
+*)
+
+  (* ---TEST FORD FULKERSON MAX FLOX COUT MIN ------- *)
+  let mfcm_of_string str = Scanf.sscanf str "%d/%d/%d" (fun flow capa cout -> (flow,capa, cout)) in
+  let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout) in
+
+  let mfcm_graph = gmap graph mfcm_of_string in 
+  let (debit_final, cout_final) = flow_max_cout_min mfcm_graph 0 9 in
+  let () =Printf.printf"debit final : %d \n%!" debit_final in 
 
 
   (* ------- TEST INITIALISATION FORD FULK --------- 

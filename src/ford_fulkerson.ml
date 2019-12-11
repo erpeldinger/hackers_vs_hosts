@@ -1,4 +1,3 @@
-
 open Tools
 open Graph
 
@@ -32,22 +31,24 @@ let change_color l s color =
   in 
   List.rev (loop [] l s)
 
-(* -------------- Fonctions relatives au gr décart ------------------------*)
+(* ----------------------- Functions related to the residual graph ----------------------------------*)
 
-(*arcs_1 représente les arcs qui sont modifié pour créer le graphe d'écart *)
+(* Create a graph containing forward arcs *)
 let arcs_1 gr = gmap gr (fun (flow, capa) -> (capa-flow,1))
-(* arcs_2 représente les arcs qui sont ajouté pour créer le graphe d'écart *)(* (flow, capa) -> flow) *)
+(* Create a graph containing backward arcs *)
 let arcs_2 gr = 
   let modif_arc gr id1 id2 (x,y) = new_arc gr id2 id1 ((x,0)) in
   let new_gr = clone_nodes gr in
   e_fold gr modif_arc new_gr ;;
 
-(*renvoie le graphe d'écart de gr*)
+(* Return the residual graph *)
 let graphe_ecart gr = 
   let gr_1 = arcs_1 gr and gr_2 = arcs_2 gr in
   e_fold gr_1 new_arc gr_2
 
-(* Return a path without the state of its nodes *)
+(* ----------------------- [END of functions related to the residual graph] ----------------------- *)
+
+(* Return a path (list of id) without the state of its nodes *)
 let recup_chemin l s p =
   let rec aux acu l = match l with
     | [] -> acu
@@ -56,7 +57,7 @@ let recup_chemin l s p =
   in 
   List.rev (aux [] l)
 
-(* prend un chemin composé d'id et renvoie le chemin compose de (id id flow) *)
+(* Return a path (list of id1*id2*flow) *)
 let recup_flow_chemin gr l =
   let rec recup acu l = match l with
     | [] -> acu
@@ -70,7 +71,7 @@ let recup_flow_chemin gr l =
   in
   List.rev (recup [] l)
 
-(* recupere le dernier id antecedant dans la liste des antecedants *)
+(* Return the id of the last grey node in the given list (list of previous nodes) *)
 let recup_antecedant l1 l2 = 
   let rec pas_noir acu l_ant = match l_ant with
     | [] -> acu
@@ -83,6 +84,7 @@ let recup_antecedant l1 l2 =
   in
   aux (List.rev (pas_noir [] l1) )
 
+(* Return an orderly path from two list (states list and list of previous nodes) *)
 let ordre_chemin l_states l_ant p = 
   let rec aux l acu = match l with
     | [] -> acu
@@ -90,12 +92,12 @@ let ordre_chemin l_states l_ant p =
   in
   List.rev (p :: (aux l_ant []))
 
+(* --------------------------------- Print functions ---------------------------------------*)
+
 let mon_match color = match color with
   |Black -> "Black"
   |Grey->  "Grey"
   |White -> "White"
-
-(* --------------------------------- Print functions ---------------------------------------*)
 
 let print_state states = 
   let rec aux l = match l with
@@ -127,38 +129,39 @@ let print_res_find_path chemin =
 
 (*---------------------------- FORD FULKERSON ALGORITHM ------------------------------------------- *)
 
+(* Find a path from n1 to n2 in the given residual graph, return [(-1,-1,0)] if there is no path *)
 let find_path gr n1 n2 =
-  let init_gr_ecart = (* graphe_ecart*) gr in  (* ON TRAVAILLE DEJA AVEC LE GRAPHE D'ECART  donc init inutile*)
   let l_state = nodes_state gr in
+  (* Function that returns two lists : the final states' list and the list of previous nodes *)
   let rec voisins s vois les_states l_antecedant = 
     let states = change_color les_states s Grey in
     match vois with
     | [] -> if s==n2 then (change_color states s Grey, List.rev (s::(List.rev l_antecedant))) else (
         let l_state_modif=change_color states s Black in
         let antecedant=recup_antecedant l_antecedant l_state_modif in
-        if (antecedant >=0) then voisins antecedant (out_arcs init_gr_ecart antecedant) l_state_modif (List.rev (s :: (List.rev l_antecedant)))
+        if (antecedant >=0) then voisins antecedant (out_arcs gr antecedant) l_state_modif (List.rev (s :: (List.rev l_antecedant)))
         else ([(-1,Black)], []) (* No path found *)
       )
     | (id,(flow,1)) :: rest -> if (flow>0) && (id==n2) then ((change_color states n2 Grey), List.rev (s::(List.rev l_antecedant))) else  (* verification de la terminaison *)
-      (if (flow>0) && (List.assoc id states)==White then voisins id (out_arcs init_gr_ecart id) states (List.rev (s :: (List.rev l_antecedant)))
+      (if (flow>0) && (List.assoc id states)==White then voisins id (out_arcs gr id) states (List.rev (s :: (List.rev l_antecedant)))
       else voisins s rest states l_antecedant)
     | (id,(flow,0)) :: rest -> if flow>0 then
-                              (match (find_arc init_gr_ecart id s) with
+                              (match (find_arc gr id s) with
                               | None -> failwith "erreur graphe ecart : arc dans un seul sens"
                               | Some (flow, sens) -> if (flow>0) && (id==n2) then (change_color states n2 Grey, List.rev (s::(List.rev l_antecedant))) else  (* verification de la terminaison *)
-                                    (if (flow>0) && (List.assoc id states)==White then voisins id (out_arcs init_gr_ecart id) states (List.rev (s :: (List.rev l_antecedant)))
+                                    (if (flow>0) && (List.assoc id states)==White then voisins id (out_arcs gr id) states (List.rev (s :: (List.rev l_antecedant)))
                                     else voisins s rest states l_antecedant)
                               ) 
                               else voisins s rest states l_antecedant
     | (id,(flow,a)) :: rest -> failwith ("erreur lbl find path"^(string_of_int a))
   in
-  let (state_final, l_ant) = voisins n1 (out_arcs (init_gr_ecart) n1) l_state [] in
+  let (state_final, l_ant) = voisins n1 (out_arcs (gr) n1) l_state [] in
   if state_final==[(-1,Black)] then [(-1,-1,0)] (* No path found *)
   else 
     let chemin_ordonne = ordre_chemin state_final l_ant n2 in
-    recup_flow_chemin init_gr_ecart chemin_ordonne
+    recup_flow_chemin gr chemin_ordonne
 
-(* Get the min flow of a path and calculates the residual flow *)
+(* Get the min flow of a path *)
 let get_vflow path = 
   let find_min v1 v2 = if v1 < v2 then v1 else v2 in
   let rec aux chemin flow = match chemin with
@@ -167,9 +170,10 @@ let get_vflow path =
   in 
   aux path max_int;;
 
+(* Modify two arcs in the given residual graph : add v to the id1->id2 arc and substract v to the id2->id1 arc *)
 let modifier_2arcs gr id1 id2 v = sub_tecart_arc (add_tecart_arc gr id1 id2 v) id2 id1 (v)
 
-(* Update le graphe d'écart -> modified according to the residual flow *)
+(* Update the given residual graph according to the given residual flow *)
 let update_graph gr path v = 
   let rec update_path gr1 path = match path with
     | [] -> gr1
@@ -177,9 +181,9 @@ let update_graph gr path v =
       match (find_arc gr id1 id2) with
       | None -> failwith "Probleme l'arc n'existe pas"
       | Some (flow, sens) -> match (flow,sens) with
-        | (flow, 0) -> if (flow-v >=0) (* Backward arc, no need to check the value of the forward arc *)
+        | (flow, 0) -> if (flow-v >=0)
           then update_path (modifier_2arcs gr1 id1 id2 v) rest
-          else failwith "erreur valeur negative si soustraction (retour)" (*Cannot substract flow, its value is already 0 *)
+          else failwith "erreur valeur negative si soustraction (retour)"
         | (_, 1) -> if (flow-v)>=0 then update_path (modifier_2arcs gr1 id2 id1 v) rest
         else failwith "erreur valeur negative si soustraction (aller) flow et v "
         | (_,a) -> failwith ("erreur format lbl gr ecart "^(string_of_int a))
@@ -194,7 +198,7 @@ let get_max_flow gr s p =
   in 
   (* While a path exists *)
   let rec loop gr2 debit = match (find_path gr2 s p) with
-    | [(-1,-1,0)] -> debit
+    | [(-1,-1,0)] -> (debit, gr2)
     | res -> let var_flow = get_vflow res in  
       loop (update_graph gr2 res var_flow) (debit + var_flow) 
   in
@@ -203,40 +207,45 @@ let get_max_flow gr s p =
 
 (* ---------------------- MAX FLOW/MIN COST - MOORE-BELLMAND-FORD ALGORITHM -------------------------*)
 
+
 (* Update a flow graph *)
 let update_graph_BF gr path v = 
   let rec update_path gr1 path = match path with
     | [] -> gr1
-    | (id1, id2, flow) :: rest -> 
+    | (id1, id2, _) :: rest -> 
       match (find_arc gr id1 id2) with
-      | None -> (* arc inverse donc soustraction *) update_path (sub_mfmc_arc gr1 id2 id1 v) rest
-      | Some (flow, capa, _) -> update_path (add_mfmc_arc gr1 id1 id2 v) rest
+      | None -> update_path (sub_mfmc_arc gr1 id2 id1 v) rest
+      | Some (_, _, _) -> update_path (add_mfmc_arc gr1 id1 id2 v) rest
   in 
   update_path gr path
 
-(*  Backward arcs, if flow /= capacity, its value is "+cost" *)
+(* -------------------------- Functions related to the residual graph -------------------------- *)
+
+(*  Forward arcs, if flow /= capacity, its value is "+cost", otherwise its value is 0 *)
 let arcs1_MFCM gr = gmap gr (fun (flow, capa, cout) -> if not(flow==capa) then (cout,1) else (0,1) )
 
-(* Backward arcs, if flow /=0, its value is "-cost "*)
+(* Backward arcs, if flow /=0, its value is "-cost ", otherwise its value is 0 *)
 let arcs2_MFCM gr = 
   let modif_arc gr id1 id2 (flow,capa,cout) = new_arc gr id2 id1 ( if not(flow==0) then ((-cout), 0) else (0,0)) in
   let new_gr = clone_nodes gr in
   e_fold gr modif_arc new_gr ;;
 
+(* Return the residual graph *)
 let gr_ecart_MFCM gr = 
   let gr_1 = arcs1_MFCM gr and gr_2 = arcs2_MFCM gr in
   e_fold gr_1 new_arc gr_2 
 
-(* Return a list filled with the predecessors of a node *)
+(* --------------------------------- [ END of functions related to the residual graph ] ---------------------------------------*)
+
+(* Return a list filled with the predecessors of the given node *)
 let get_pred gr id = 
-(* Check if there is an existing arc between the source and the id *)
   let rec aux iter acu = match (node_exists gr iter) with
     | false -> acu
     | true -> if not((find_arc gr iter id)==None) then (aux (iter + 1) (iter::acu))else (aux (iter +1) acu)
   in 
   aux 0 []
 
-(* Initialization of the Bellman-Ford algorithm *)
+(* Initialization of the Bellman-Ford algorithm : return a list of costs *)
 let init_bellman gr s =
   let rec loop iter acu = match (node_exists gr iter) with
     | false -> acu
@@ -245,10 +254,10 @@ let init_bellman gr s =
   List.rev (loop 0 [])
 
 (* Return the cost in a list of tuple (cost,id) *)
-let get_cout l x = 
+let get_cout l id = 
   let rec aux l iter = match l with 
     | [] -> failwith "[get_cout] Sommet inexistant dans la liste"
-    | (c, id) :: rest -> if x==iter then c else aux rest (iter+1)
+    | (c, _) :: rest -> if id==iter then c else aux rest (iter+1)
     in 
   aux l 0
 
@@ -257,9 +266,7 @@ let get_val_arc gr x y = match find_arc gr x y with
   | None -> failwith "[get_val_arc] Arc inexistant"
   | Some (cout, sens) -> cout
 
-(* mise à jour du cout dans la liste des couts ----------DEPART A ZERO ------------ *)
-
-(* Copy the given list of costs and modify the x column with (pred, new_cout) *)
+(* Copy the given list of costs and modify the column x with (pred, new_cout) *)
 let change_cost lcout x pred new_cout =
   let rec aux l iter acu = match l with
     | [] -> acu
@@ -268,8 +275,9 @@ let change_cost lcout x pred new_cout =
   in 
   List.rev (aux lcout 0 [])
 
-
-(* le "for tous les predecesseurs" avec lpred la liste des y  + RENVOIE LE CONTINUER *)
+(* For all predecessors y of x, update the cost of x
+and return a boolean (cont) that is true if there has been at least a change in the list of costs 
+and the list of costs *)
 let maj_all_pred gr lcout x lpred =
   let rec aux l lcost cont= match l with
     | [] -> (lcost, cont)
@@ -289,11 +297,12 @@ let maj_all_pred gr lcout x lpred =
   let (res,cont) = aux lpred lcout false in
   (res,cont)
 
-(* le for "tous les sommets x!=s" + LE CONTINUER*)
+(* For all nodes x (except the source s), apply the "maj_all_pred" function 
+and return a boolean (cont) and the list of costs *)
 let for_all_sommets gr lcout s = 
   let rec aux iter l continuer = 
-    if node_exists gr iter then (* pour tous les nodes du graphe*)
-        if iter==s then aux (iter+1) l continuer (* x=s donc on ne parcours pas les precesseurs*)
+    if node_exists gr iter then
+        if iter==s then aux (iter+1) l continuer
         else let (new_lcout,cont)=maj_all_pred gr l iter (get_pred gr iter) in 
               if cont then aux (iter+1) new_lcout true
               else aux (iter+1) new_lcout continuer
@@ -301,7 +310,7 @@ let for_all_sommets gr lcout s =
   in
   aux 0 lcout false
 
-(* Get the id of a node in a list of tuple (cost,id) *)
+(* Return the id of the given node in a list of tuple (cost,id) *)
 let get_id lcout id = 
   let rec aux l iter = match l with
     | [] -> failwith ("[get_id] error"^(string_of_int iter))
@@ -310,14 +319,14 @@ let get_id lcout id =
   in 
   aux lcout 0
 
-(* Return the path *)
+(* Return the path (list of nodes) *)
 let recup_chemin_bf l s p = 
   let rec aux id_courant acu = 
     if id_courant==s then acu else let next_id = get_id l id_courant in aux next_id (next_id :: acu)
   in 
   aux p [p]
 
-(* Find a valid path*)
+(* Return true if the given path is valid (the cost is not max_int or more) *)
 let chemin_valide lcout path = 
   let rec aux validite l = match l with
     | [] -> validite
@@ -325,7 +334,6 @@ let chemin_valide lcout path =
         | (cout, _) -> if cout == max_int then false else aux validite rest
   in 
   aux true path 
-
 
 (* Application of the Bellman-Ford algorithm to find a path, based on the flow graph *)
 let find_bellman gr s p = 
@@ -343,18 +351,17 @@ let find_bellman gr s p =
   let flow_chemin = recup_flow_chemin gr_ecart chemin_id in
   flow_chemin
 
-
-(* Get a path cost*)
-let get_cout_chemin gr res =
+(* Return the cost of a path *)
+let get_cout_chemin gr res = 
   let rec aux acu l = match l with 
   | [] -> acu
   | (id1, id2, cout) :: rest -> match (find_arc gr id1 id2) with
-        | None -> begin (* on a pris un arc retour *)
+        | None -> begin
            match (find_arc gr id2 id1) with 
             | None -> failwith "[get_vflow_bf] error arc inexistant"
-            | Some (flow, capa, cout) -> aux (acu+(cout*capa)) rest
+            | Some (_, _, cout) -> aux (acu+cout) rest
           end
-    | Some (flow, capa, cout) -> aux (acu+(cout*capa)) rest
+    | Some (_, _, cout) -> aux (acu+cout) rest 
   in 
   aux 0 res
 
@@ -371,39 +378,27 @@ let get_vflow_bf gr chemin =
   let rec aux acu l = match l with
     | [] -> acu
     | (id1, id2, cout) :: rest -> match (find_arc gr id1 id2) with
-        | None -> begin (* on a pris un arc retour *)
+        | None -> begin
            match (find_arc gr id2 id1) with 
             | None -> failwith "[get_vflow_bf] error arc inexistant"
-            | Some (flow, capa, cout) -> aux (flow::acu) rest
+            | Some (flow, capa, cout) -> aux (capa-flow::acu) rest
           end
         | Some (flow, capa, cout) -> aux ((capa-flow)::acu) rest
   in 
   let liste_flow = aux [] chemin in 
   find_min liste_flow
 
-
+(* convert flow, capa and cost to string *)
 let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout)
 
 (* Find the max flow/min cost*)
 let flow_max_cout_min gr s p = 
-(* let gr_ecart = gr_ecart_MFCM gr in *)
   let rec loop index gr2 debit cout = 
   Gfile.export ("test"^(string_of_int index)) (gmap gr2 string_of_mfcm);
   match (find_bellman gr2 s p) with
-      | [(-1,-1,0)] -> (debit, cout)
+      | [(-1,-1,0)] -> (debit, cout, gr2)
       | res -> let var_flow = get_vflow_bf gr2 res in 
-      let new_cost = get_cout_chemin gr2 res in
-      (* PENSER A AFFICHER LE FLOW ET COUT FINAL *)
-      let () = Printf.printf"une iter : var_flow=%d et cout=%d \n%!" var_flow new_cost in 
+      let new_cost = (get_cout_chemin gr2 res) *var_flow in
       loop (index+1) (update_graph_BF gr2 res var_flow) (debit + var_flow) (cout+new_cost)
   in
   loop 0 gr 0 0
-
-
-(* Seek a path between two nodes.
-    If the path exists, it returns a list of arcs.
-    Otherwise, an exception is raised.
-*)
-(* Return the flow variation of a path *)
-
-(* Create a new graph with the given list (cf get_path_dir) and its flow *)

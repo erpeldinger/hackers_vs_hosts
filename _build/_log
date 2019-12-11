@@ -1,6 +1,6 @@
 ### Starting build.
 # Target: src/ftest.ml.depends, tags: { extension:ml, file:src/ftest.ml, include, ocaml, ocamldep, quiet, traverse }
-ocamldep.opt -modules src/ftest.ml > src/ftest.ml.depends # cached
+ocamldep.opt -modules src/ftest.ml > src/ftest.ml.depends
 # Target: src/ford_fulkerson.mli.depends, tags: { extension:mli, file:src/ford_fulkerson.mli, include, ocaml, ocamldep, quiet, traverse }
 ocamldep.opt -modules src/ford_fulkerson.mli > src/ford_fulkerson.mli.depends # cached
 # Target: src/graph.mli.depends, tags: { extension:mli, file:src/graph.mli, include, ocaml, ocamldep, quiet, traverse }
@@ -18,7 +18,7 @@ ocamldep.opt -modules src/tools.mli > src/tools.mli.depends # cached
 # Target: src/tools.cmi, tags: { byte, compile, extension:mli, file:src/tools.mli, include, interf, ocaml, quiet, traverse }
 ocamlc.opt -c -I src -I src/tool_fichiers -o src/tools.cmi src/tools.mli # cached
 # Target: src/ftest.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:src/ftest.cmo, file:src/ftest.ml, implem, include, ocaml, quiet, traverse }
-ocamlc.opt -c -I src -I src/tool_fichiers -o src/ftest.cmo src/ftest.ml # cached
+ocamlc.opt -c -I src -I src/tool_fichiers -o src/ftest.cmo src/ftest.ml
 # Target: src/ford_fulkerson.ml.depends, tags: { extension:ml, file:src/ford_fulkerson.ml, include, ocaml, ocamldep, quiet, traverse }
 ocamldep.opt -modules src/ford_fulkerson.ml > src/ford_fulkerson.ml.depends
 # Target: src/gfile.ml.depends, tags: { extension:ml, file:src/gfile.ml, include, ocaml, ocamldep, quiet, traverse }
@@ -37,11 +37,6 @@ ocamlopt.opt -c -I src -I src/tool_fichiers -o src/tools.cmx src/tools.ml # cach
 ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ford_fulkerson.cmx src/ford_fulkerson.ml
 # Target: src/ftest.cmx, tags: { compile, extension:cmx, extension:ml, file:src/ftest.cmx, file:src/ftest.ml, implem, include, native, ocaml, quiet, traverse }
 ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ftest.cmx src/ftest.ml
-+ ocamlopt.opt -c -I src -I src/tool_fichiers -o src/ftest.cmx src/ftest.ml
-File "src/ftest.ml", line 19, characters 6-13:
-19 |   and outfile = Sys.argv.(4)
-           ^^^^^^^
-Warning 26: unused variable outfile.
 # Target: src/ftest.native, tags: { dont_link_with, extension:native, file:src/ftest.native, include, link, native, ocaml, program, quiet, traverse }
 ocamlopt.opt -I src src/graph.cmx src/gfile.cmx src/tools.cmx src/ford_fulkerson.cmx src/ftest.cmx -o src/ftest.native
 # Compilation successful.

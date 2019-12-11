@@ -15,8 +15,8 @@ type state = White | Grey | Black
 
 
 (* Use of the Bellman-Ford algorithm to get the max flow with a minimal cost*)
-val flow_max_cout_min: (int * int * int) graph -> id -> id -> int*int
+val flow_max_cout_min: (int * int * int) graph -> id -> id -> int*int* (int * int * int) graph
 
 (* Apply the Ford Fulkerson algorithm to get the max flow one between two nodes*)
-val get_max_flow: (int * int) graph -> id -> id -> int
+val get_max_flow: (int * int) graph -> id -> id -> int * (int * int) graph 
 

@@ -27,33 +27,35 @@ let () =
   let graph = from_file infile in
 
 
-  (* --------- FORD FULKERSON MAX FLOX MIN COST -------- *)
-(*
+  (* --------- FORD FULKERSON MAX FLOX MIN COST -------- 
+
   let mfcm_of_string str = Scanf.sscanf str "%d/%d/%d" (fun flow capa cout -> (flow,capa, cout)) in
   let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout) in
 
   let mfcm_graph = gmap graph mfcm_of_string in 
-  let (debit_final, cout_final) = flow_max_cout_min mfcm_graph _source _sink in
-  let () =Printf.printf"debit final : %d \n%!" debit_final in *)
-
-  (* ----------------- FORD FULKERSON ------------------ *)
-
-    let tarc_of_string str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in  
-
-  
-    let int_graph = gmap graph tarc_of_string in
-    let debit_final = get_max_flow int_graph _source _sink in
-    let () =Printf.printf"debit final : %d \n%!" debit_final in 
-
-
-  (*
-  A FAIRE
-  let () = export outfile  in
+  let (debit_final, cout_final, gr_final) = flow_max_cout_min mfcm_graph _source _sink in
+  let () = Printf.printf"debit final : %d \n%!" debit_final in
+  let () = Printf.printf"cout final : %d \n%!" cout_final in
+  let () = export outfile (gmap gr_final string_of_mfcm) in
   *)
 
-  (* LES TEST : 
-     ./ftest.native graphs/graph3_ok.txt 0 4 graphs/test.dot
-     dot -Tsvg graphs/test.dot > graphs/test.svg
+  (* ----------------- FORD FULKERSON ------------------ 
+
+    let tarc_of_string str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in  
+    let string_of_tecart (flow, sens) = match (flow, sens) with
+    | (flow, 0) -> (string_of_int flow) ^ "/retour"
+    | (flow, 1) -> (string_of_int flow) ^ "/aller"
+    | (flow,_) -> (string_of_int flow) ^ "/ERROR" in
+  
+    let int_graph = gmap graph tarc_of_string in
+    let (debit_final, gr_final) = get_max_flow int_graph _source _sink in
+    let () =Printf.printf"debit final : %d \n%!" debit_final in 
+    let () = export outfile (gmap gr_final string_of_tecart) in 
+*)
+
+  (* LES TESTS : 
+     ./ftest.native monchemin.txt source puits monchemin.dot
+     dot -Tsvg monchemin.dot > monchemin.svg
   *)
  
   ()

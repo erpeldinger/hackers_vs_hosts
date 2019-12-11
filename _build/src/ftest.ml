@@ -39,7 +39,7 @@ let () =
   let () = export outfile (gmap gr_final string_of_mfcm) in
   *)
 
-  (* ----------------- FORD FULKERSON ------------------ *)
+  (* ----------------- FORD FULKERSON ------------------ 
 
     let tarc_of_string str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in  
     let string_of_tecart (flow, sens) = match (flow, sens) with
@@ -51,11 +51,11 @@ let () =
     let (debit_final, gr_final) = get_max_flow int_graph _source _sink in
     let () =Printf.printf"debit final : %d \n%!" debit_final in 
     let () = export outfile (gmap gr_final string_of_tecart) in 
+*)
 
-
-  (* LES TEST : 
-     ./ftest.native graphs/graph3_ok.txt 0 4 graphs/test.dot
-     dot -Tsvg graphs/test.dot > graphs/test.svg
+  (* LES TESTS : 
+     ./ftest.native monchemin.txt source puits monchemin.dot
+     dot -Tsvg monchemin.dot > monchemin.svg
   *)
  
   ()

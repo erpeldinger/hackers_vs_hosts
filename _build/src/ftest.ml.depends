@@ -1,1 +1,1 @@
-src/ftest.ml: Array Ford_fulkerson Gfile Printf Scanf Sys Tools
+src/ftest.ml: Array Ford_fulkerson Gfile Printf Sys Tools

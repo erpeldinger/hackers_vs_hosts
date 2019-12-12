@@ -16,6 +16,8 @@ Note that 3 graphs are available for testings :
         - graph_bip/.txt ; containing 10 nodes (from 0 to 8)
         - graphMF.txt ; containing 5 nodes (from 0 to 4)
 
+These graphs are also in svg format so you can visualize them.
+
 See below how to test each part of the project.
 
 

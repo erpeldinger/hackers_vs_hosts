@@ -1,25 +1,25 @@
+%% Ceci est le format type d'un fichier Hackers.txt
+
 h 4
 
-n 1
-a 0
-f 1
-t 1
-m 1
+n 1 a 0 f 1 t 1 m 1
+.
+n ....
+.
+n ....
+.
 
-nb_nuits 1
-animaux 0
-fumeur : 0
-tolere_cig : 1
-mixte 0
+%% Ceci est ce qu'il veut dire
 
-nb_nuits 1
-animaux 0
-fumeur : 0
-tolere_cig : 1
-mixte 1
+nombre de hackers : 4
 
-nb_nuits 1
-animaux 0
-fumeur : 0
-tolere_cig : 1
-mixte 1
+hacker numero 1 : 
+    nb_nuits 1
+    n'est pas allergique aux animaux
+    ne fumer pas
+    tolère la cigarette
+    s'en fiche de dormir avec des gens du sexe opposé
+
+hacker numero 2 : ....
+
+hacker numero 3 : ....

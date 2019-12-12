@@ -63,8 +63,5 @@ Fulkerson part).
 of modules (or of graph.ml).
         - The "get_cout_chemin" function could be deleted so that costs should
 getted in the final list of costs.  
-        - Within the two functions "arcs1_MCFM" and "arcs2_MCMF" the case where 
-the cost is 0 is not taken into account, to do so, something has to be done with
-the max_int.
 
 

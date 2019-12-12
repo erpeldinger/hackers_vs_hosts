@@ -1,3 +1,5 @@
+%% Ceci est le format type Hosts.txt
+
 h 3
 
 p 1 n 1 d 0 c 1 a 0 f 1 t 1
@@ -5,23 +7,23 @@ p ....
 p ....
 .
 
+%% Ceci est ce qu'il veut dire
 
-nb_places 1
-nb_nuits 1
-nb_dortoir 0 
-nb_chb_indiv 1 
-animaux 0
-fumeur : 0
-tolere_cig : 0
+nombre d'hotes : 3
 
-nb_places 2
-nb_nuits 1
-nb_dortoir 1/2 
-nb_chb_indiv 0
-animaux 0
-fumeur : 0
-tolere_cig : 0
+hote numero 1 : 
+    nb_places 1
+    nb_nuits 1
+    nb_dortoir 0 
+    nb_chb_indiv 1 
+    n'a pas d'animaux
+    n'est pas fumeur
+    ne tolere pas la cigarette
 
+hote numero 2 : ....
+hote numero 3 : ....
+
+Il n'y plus d'hotes
 
 
 

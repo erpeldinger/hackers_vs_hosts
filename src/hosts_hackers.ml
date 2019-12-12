@@ -32,23 +32,24 @@ and tl_host = Host of thost | Cell_host of host_cell;;
 type tl_hacker = Hacker of thacker | Cell_hacker of hacker_cell
 and hacker_cell = {mutable h_courant : thacker; mutable suivant : tl_hacker};;
 
+(* Last host and hacker in a list (equivalent to null in other languages) *)
 let dortoir_dernier = {nb_dortoirs=(-1);nb_lits=[]};;
 let host_dernier = {id_host=(-1); nb_places=(-1); nb_nuits=(-1); nb_dortoir=dortoir_dernier; nb_chb_indiv=(-1); animaux=(-1);fumeur=(-1);tolere_cig=(-1)};;
-
 let hacker_dernier = {id_hacker=(-1); nb_nuits=(-1); animaux=(-1);fumeur=(-1);tolere_cig=(-1); mixte=(-1)};;
 
-(* Fonctions permettant l'ajout d'un host/hacker dans un type tl_host ou tl_hacker *)
+(* Add a host in the given list (type host_cell) *)
 let add_tlhost host lhost =
   let rec aux l = match l with
   | Host h-> if h.id_host==(-1) then failwith "erreur add_tlhost" else ()
-  | Cell_host x -> if x.courant.id_host==(-1) then x.courant<-host else aux x.suivant
+  | Cell_host x -> if x.courant.id_host==(-1) then (x.courant<-host ; let lastH = Host host_dernier in x.suivant<-lastH) else aux x.suivant
   in
   aux lhost
 
+(* Add a hacker in the given list (type hacker_cell) *)
 let add_tlhacker hacker lhacker =
   let rec aux l = match l with
   | Hacker h-> if h.id_hacker==(-1) then failwith "erreur add_tlhacker" else ()
-  | Cell_hacker x -> if x.h_courant.id_hacker==(-1) then x.h_courant<-hacker else aux x.suivant
+  | Cell_hacker x -> if x.h_courant.id_hacker==(-1) then (x.h_courant<-hacker ; let lastH = Hacker hacker_dernier in x.suivant<-lastH) else aux x.suivant
   in
   aux lhacker
 
@@ -127,10 +128,25 @@ let creer_hacker gr line list id =
     failwith "from_file"
 
 (* Match the hacker with each host to see if an arc need to be created, and create it if needed*)
-let creer_arc gr line = assert false;;
+(* We still need to change the label of the arcs *)
+let creer_arc gr line list hacker =
+  let rec loop gr l = match l with
+    | Host h -> if compatible h hacker then new_arc gr h.id_host hacker.id_hacker "0/1" else gr
+    | Cell_host cl -> if compatible cl.courant hacker then loop (new_arc gr cl.courant.id_host hacker.id_hacker "0/1") cl.suivant else loop gr cl.suivant
+  in 
+  loop gr list
+
+(* Match each hacker with each host to see if an arc need to be created, and create it if needed *)
+let creer_arcs graph line list lh =
+  let rec loop gr l = match l with
+    | [] -> gr
+    | h :: rest -> loop (creer_arc gr line list h) rest
+  in 
+  loop graph lh
 
 (* ---------------------------- Functions that create the graph corresponding to the given files ----------------------------------- *)
 
+(* Create a graph containing the nodes corresponding to the given file (Hosts.txt) *)
 let gr_hosts phosts = 
 
   let infile = open_in phosts in
@@ -154,14 +170,14 @@ let gr_hosts phosts =
             (* The first character of a line determines its content *)
             else match line.[0] with
             (*| 'h' ->  useless *)
-            | 'p' -> creer_host graph line list id (* create the host, add it to the liste and create the corresponding node *)
+            | 'p' -> creer_host graph line list id (* create the host, add it to the list and create the corresponding node *)
             (*| 'd' -> We need to create a function to exploit the "t_dortoir" structure *)
             (*| '.' -> useless, everything is done above *)
             | _ -> failwith"ERREUR lecture ligne infile host"
         in 
         loop n2 graph2 (id+1)
 
-        with End_of_file -> graph
+        with End_of_file -> (graph, list)
     in
 
     let final_graph = loop 0 empty_graph 0 in
@@ -169,12 +185,13 @@ let gr_hosts phosts =
     close_in infile ;
     final_graph
 
-let gr_hackers phackers = 
+(* Create a graph containing the nodes and arcs corresponding to the given file (Hackers.txt) *)
+let gr_hackers phackers gr_host list_host = 
 
   let infile = open_in phackers in
 
   (* A list that will contain all the created hackers *)
-  let list = Hacker hacker_dernier in
+  let list_hackers = Hacker hacker_dernier in
 
   (* Read all lines until end of file. 
    * n is the current node counter. *)
@@ -192,8 +209,8 @@ let gr_hackers phackers =
             (* The first character of a line determines its content *)
             else match line.[0] with
             (*| 'h' ->  useless *)
-            | 'n' -> creer_hacker graph line list id (* create the host, add it to the liste and create the corresponding node *)
-            | '.' -> creer_arc graph line (* create the arcs that need to be created *)
+            | 'n' -> creer_hacker graph line list id (* create the host, add it to the list and create the corresponding node *)
+            | '.' -> creer_arc graph line list_host list_hackers(* create the arcs that need to be created *)
             | _ -> failwith"ERREUR lecture ligne infile host"
         in
 
@@ -202,19 +219,15 @@ let gr_hackers phackers =
         with End_of_file -> graph
     in
 
-    let final_graph = loop 0 empty_graph 0 in
+    let final_graph = loop 0 gr_host 0 in
 
     close_in infile ;
     final_graph
-;;
 
-(* Function that will merge the two graphs above *)
-let creer_gr = assert false
+(* Function that create the final graph *)
+let creer_gr phosts phackers = 
+  let (gr_host, list_hosts) = gr_hosts phosts in 
+  gr_hackers phackers gr_host list_hosts
 
 (* Run the fold fulkerson algorithm and create the solution (who is going to sleep where ?) *)
 let affectation = assert false
-
-
-
-
-

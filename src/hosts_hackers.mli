@@ -8,7 +8,7 @@ type thost = {
     id_host : int;
     nb_places : int;
     nb_nuits : int;
-    nb_dortoir : t_dortoir;
+    nb_dortoir : tdortoir;
     nb_chb_indiv : int;
     animaux : bool;
     fumeur : bool;
@@ -25,4 +25,4 @@ type thacker = {
     }
 
 (* Indicate wether an arc can be created between a host and a hacker*)
-val compatible : t_host -> t_hacker -> bool
+val compatible : thost -> thacker -> bool

@@ -168,7 +168,6 @@ let gr_hosts phosts =
 
     close_in infile ;
     final_graph
-;;
 
 let gr_hackers phackers = 
 

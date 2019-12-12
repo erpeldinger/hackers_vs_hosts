@@ -221,12 +221,12 @@ let update_graph_BF gr path v =
 
 (* -------------------------- Functions related to the residual graph -------------------------- *)
 
-(*  Forward arcs, if flow /= capacity, its value is "+cost", otherwise its value is 0 *)
-let arcs1_MFCM gr = gmap gr (fun (flow, capa, cout) -> if not(flow==capa) then (cout,1) else (0,1) )
+(*  Forward arcs, if flow /= capacity, its value is "+cost", otherwise its value is max int *)
+let arcs1_MFCM gr = gmap gr (fun (flow, capa, cout) -> if not(flow==capa) then (cout,1) else (max_int,1) )
 
-(* Backward arcs, if flow /=0, its value is "-cost ", otherwise its value is 0 *)
+(* Backward arcs, if flow /=0, its value is "-cost ", otherwise its value is max_int *)
 let arcs2_MFCM gr = 
-  let modif_arc gr id1 id2 (flow,capa,cout) = new_arc gr id2 id1 ( if not(flow==0) then ((-cout), 0) else (0,0)) in
+  let modif_arc gr id1 id2 (flow,capa,cout) = new_arc gr id2 id1 ( if not(flow==0) then ((-cout), 0) else (max_int,0)) in
   let new_gr = clone_nodes gr in
   e_fold gr modif_arc new_gr ;;
 
@@ -284,7 +284,7 @@ let maj_all_pred gr lcout x lpred =
     | y :: rest -> let cout_x = get_cout lcost x in 
                   let cout_y = get_cout lcost y in
                   let cout_arc_xy = get_val_arc gr y x in
-                  if not(cout_arc_xy=0) then
+                  if not(cout_arc_xy=max_int) then
                     if not(cout_y ==max_int) then
                       let new_cout = cout_y + cout_arc_xy in 
                       if cout_x > new_cout then 

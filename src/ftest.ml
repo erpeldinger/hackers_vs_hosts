@@ -28,7 +28,7 @@ let () =
 
 
   (* -------------------------- FORD FULKERSON ------------------------------- *)
-
+  (*
     let tarc_of_string str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in  
     let string_of_tecart (flow, sens) = match (flow, sens) with
     | (flow, 0) -> (string_of_int flow) ^ "/retour"
@@ -39,11 +39,11 @@ let () =
     let (debit_final, gr_final) = get_max_flow int_graph _source _sink in
     let () =Printf.printf"debit final : %d \n%!" debit_final in 
     let () = export outfile (gmap gr_final string_of_tecart) in 
-  
+  *)
 
 
   (* -------------- FORD FULKERSON MAX FLOX MIN COST ------------------------- *)
-  (*
+  
   let mfcm_of_string str = Scanf.sscanf str "%d/%d/%d" (fun flow capa cout -> (flow,capa, cout)) in
   let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout) in
 
@@ -52,7 +52,7 @@ let () =
   let () = Printf.printf"debit final : %d \n%!" debit_final in
   let () = Printf.printf"cout final : %d \n%!" cout_final in
   let () = export outfile (gmap gr_final string_of_mfcm) in
-  *)
+  
 
   (* ------------------ Testing --------------------------------------------*)
   (*

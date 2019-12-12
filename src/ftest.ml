@@ -54,9 +54,9 @@ let () =
   let () = export outfile (gmap gr_final string_of_mfcm) in
   *)
 
-  (* ------------------ COMMANDS FOR TESTS --------------------------------------------*)
+  (* ------------------ Testing --------------------------------------------*)
   (*
-     ./ftest.native graphs/<monchemin>.txt source puits graphs/<monchemin>.dot
+     ./ftest.native graphs/<monchemin>.txt source sink graphs/<monchemin>.dot
      dot -Tsvg graphs/<monchemin>.dot > graphs/<monchemin>.svg
   *)
  

@@ -27,7 +27,7 @@ let () =
   let graph = from_file infile in
 
 
-  (* ----------------- FORD FULKERSON ------------------ *)
+  (* -------------------------- FORD FULKERSON ------------------------------- *)
 
     let tarc_of_string str = Scanf.sscanf str "%d/%d" (fun flow capa -> (flow,capa)) in  
     let string_of_tecart (flow, sens) = match (flow, sens) with
@@ -42,7 +42,7 @@ let () =
   
 
 
-  (* --------- FORD FULKERSON MAX FLOX MIN COST -------- *)
+  (* -------------- FORD FULKERSON MAX FLOX MIN COST ------------------------- *)
   (*
   let mfcm_of_string str = Scanf.sscanf str "%d/%d/%d" (fun flow capa cout -> (flow,capa, cout)) in
   let string_of_mfcm (flow, capa, cout) = (string_of_int flow) ^ "/" ^ (string_of_int capa) ^ "/" ^ (string_of_int cout) in
@@ -54,9 +54,10 @@ let () =
   let () = export outfile (gmap gr_final string_of_mfcm) in
   *)
 
-  (* LES TESTS : 
-     ./ftest.native monchemin.txt source puits monchemin.dot
-     dot -Tsvg monchemin.dot > monchemin.svg
+  (* ------------------ COMMANDS FOR TESTS --------------------------------------------*)
+  (*
+     ./ftest.native graphs/<monchemin>.txt source puits graphs/<monchemin>.dot
+     dot -Tsvg graphs/<monchemin>.dot > graphs/<monchemin>.svg
   *)
  
   ()

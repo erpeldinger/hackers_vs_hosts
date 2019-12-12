@@ -11,6 +11,7 @@ type tecart = {
   sens : int; (*1 forward arc, 0 backward arc *)
 }
 
+(* State of a node : White if not visited, Grey if it has been visited at least once, Black if "fully" visited .*)
 type state = White | Grey | Black
 
 

@@ -25,10 +25,10 @@ This part of the project implements the Ford Fulkerson algorithm in order to
 find the maximum flow of a path found between 2 nodes in a graph.
 
 Note : our algorithm is to be used with the graphFF.txt file. 
-To do so, the "FORD FULKERSON" part in the ftest.ml file must me uncommented.
+To do so, the "FORD FULKERSON" part in the ftest.ml file must be uncommented.
 
 To improve : 
-        - Our Ford Fulkerson algorithm cannot be appplied on a bipartite graph, 
+        - Our Ford Fulkerson algorithm cannot be appplied to a bipartite graph, 
 this is an issue to be solved.
         - At the end of the Ford Fulkerson algorithm, we export a residual graph
 instead of a graph of flow, which is not ideal to observe the expected result.
@@ -49,15 +49,16 @@ This part of the project is a mixture between the Ford Fulkerson algorithm,
 the Bellman-Ford one and the Busacker-Gowen one, in order to get the maximum 
 flow corresponding to the minimum cost in a graph.
 
-Note : our algorithm is to be used with the graph.txt file or the graph_bip.txt 
-one. It can be applied to a bipartite graph.
+Note : our algorithm is to be used with all graphs. It can be applied to a 
+bipartite graph.
 To do so, the "FORD FULKERSON MAX FLOX MIN COST" part in the ftest.ml file 
-must me uncommented.
+must be uncommented.
 
 To improve : 
         - Calculations are performed on two different graphs (the graph of flow
 and residual one). In order to reduced the number of operations, all 
-calculations should be done on only one graph.
+calculations should be done on only one graph (as implemented in the Ford-
+Fulkerson part).
         - In order to optimize the code, we could use more predefined functions
 of modules (or of graph.ml).
         - The "get_cout_chemin" function could be deleted so that costs should
